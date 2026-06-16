@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1d4ed8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="파주 유적지도">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<title>파주 유적지도 앱 설치</title>
+<style>
+:root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#0f172a;background:#eef4fb}
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#e0f2fe,#eff6ff 45%,#f8fafc)}
+.card{width:min(680px,100%);background:white;border-radius:24px;padding:28px;box-shadow:0 18px 60px rgba(15,23,42,.18);border:1px solid #dbe7f5}
+.header{display:flex;gap:16px;align-items:center;margin-bottom:18px}
+.logo{width:72px;height:72px;border-radius:20px;box-shadow:0 8px 24px rgba(37,99,235,.25)}
+h1{font-size:30px;line-height:1.2;margin:0;color:#0f172a}
+p{font-size:16px;line-height:1.65;color:#475569;margin:10px 0}
+.actions{display:grid;gap:10px;margin-top:22px}
+button,a.btn{appearance:none;border:0;border-radius:14px;padding:15px 16px;font-size:17px;font-weight:800;text-align:center;text-decoration:none;cursor:pointer}
+.primary{background:#1d4ed8;color:white;box-shadow:0 10px 24px rgba(29,78,216,.24)}
+.secondary{background:#eaf2ff;color:#164099;border:1px solid #bfd5ff}
+.notice{margin-top:18px;border-radius:16px;padding:14px;background:#f8fafc;border:1px solid #e2e8f0;font-size:14px;color:#334155}
+.ok{background:#ecfdf5;border-color:#bbf7d0;color:#14532d}
+.warn{background:#fff7ed;border-color:#fed7aa;color:#7c2d12}
+.small{font-size:13px;color:#64748b}
+#installBox{display:none}
+#installBox.show{display:block}
+</style>
+</head>
+<body>
+<main class="card">
+  <div class="header">
+    <img src="./icon-192.png" class="logo" alt="">
+    <div>
+      <h1>파주 유적지도 앱</h1>
+      <p>문산읍·파주읍·법원읍 유적 지도, CAD 수치지형도 기본지도, DXF 위치도, 사진, 신규 구역, 공유 사진 기능 포함</p>
+    </div>
+  </div>
+
+  <div id="installBox" class="notice ok">
+    앱 설치가 가능한 상태입니다. 아래 <b>앱 설치</b> 버튼을 눌러 설치하세요.
+  </div>
+
+  <div class="actions">
+    <button id="installBtn" class="primary" type="button">앱 설치</button>
+    <a class="btn secondary" href="./map.html">지도 바로 열기</a>
+    <a class="btn secondary" href="./desktop.html">컴퓨터용 지도 열기</a>
+  </div>
+
+  <div class="notice">
+    <b>Android Chrome/Samsung Internet</b><br>
+    설치 버튼이 작동하지 않으면 브라우저 메뉴에서 <b>앱 설치</b> 또는 <b>홈 화면에 추가</b>를 선택하세요.
+    <br><br>
+    <b>iPhone</b><br>
+    Safari에서 이 주소를 열고 <b>공유 → 홈 화면에 추가</b>를 선택하세요.
+  </div>
+
+  <p class="small">현재 위치 기능은 HTTPS 주소에서 위치 권한을 허용해야 작동합니다. 공유 사진 삭제·전체 다운로드 기능은 기존 Apps Script v8.16 배포를 그대로 사용합니다. v8.20은 기존 수치지도(등고선)를 제거하고 CAD 수치지형도를 위성지도·일반지도(OSM)와 같은 기본지도로 선택하도록 바꾼 버전입니다. PNG 지도 타일을 사용하므로 ZIP 전체를 압축 해제하면 desktop.html을 직접 열어도 표시됩니다.</p>
+</main>
+
+<script>
+let deferredInstallPrompt = null;
+const installBox = document.getElementById('installBox');
+const installBtn = document.getElementById('installBtn');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  installBox.classList.add('show');
+  installBtn.textContent = '앱 설치';
+});
+
+window.addEventListener('appinstalled', () => {
+  deferredInstallPrompt = null;
+  installBtn.textContent = '설치 완료 - 지도 열기';
+});
+
+installBtn.addEventListener('click', async () => {
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+    installBox.classList.remove('show');
+  } else {
+    alert('브라우저가 아직 앱 설치 가능 상태로 인식하지 못했습니다. 10초 정도 기다린 뒤 새로고침하거나, 브라우저 메뉴의 “앱 설치/홈 화면에 추가”를 사용해 주세요.');
+  }
+});
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js', {scope:'./'})
+      .then(reg => console.log('Service worker registered:', reg.scope))
+      .catch(err => console.log('Service worker failed:', err));
+  });
+}
+</script>
+</body>
+</html>
