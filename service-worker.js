@@ -1,4 +1,4 @@
-const CACHE_NAME = 'paju-heritage-v8-22-4-photo-url';
+const CACHE_NAME = 'paju-heritage-v8-22-5-photo-fixed';
 const CORE_ASSETS = [
   './',
   './index.html',
