@@ -1,0 +1,40 @@
+{
+  "id": "./paju-heritage-map-v8-22-4-photo-url",
+  "name": "파주 유적지도 PWA v8.22-4",
+  "short_name": "파주유적지도 v8.22-4",
+  "description": "파주 유적지도 PWA - v8.22_3 주소수정본 기준에 Google Drive 사진 URL을 매칭한 v8.22-4",
+  "lang": "ko-KR",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": [
+    "standalone"
+  ],
+  "orientation": "any",
+  "background_color": "#eef4fb",
+  "theme_color": "#1d4ed8",
+  "categories": [
+    "maps",
+    "utilities"
+  ],
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

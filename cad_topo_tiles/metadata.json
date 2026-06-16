@@ -1,0 +1,25 @@
+{
+  "version": "v8.22",
+  "type": "raster XYZ tiles",
+  "format": "PNG",
+  "zooms": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17
+  ],
+  "maxNativeZoom": 17,
+  "sourceCrs": "EPSG:5186",
+  "tileCrs": "EPSG:3857",
+  "baseMapMode": true,
+  "localFileCompatible": true,
+  "targetTowns": [
+    "문산읍",
+    "파주읍",
+    "법원읍"
+  ],
+  "style_note": "배경 흰색, 교통 연한 주황, 건물/시설/식생·경지 회색, 수계 하늘색, 지형·등고선 연한갈색(가볍게), 경계 노랑, 기본 투명도 80%"
+}
