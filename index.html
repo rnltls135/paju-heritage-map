@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="파주 유적지도">
 <link rel="manifest" href="./manifest.json">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
-<title>파주 유적지도 앱 설치</title>
+<title>파주 유적지도 앱 설치 v8.22-6</title>
 <style>
 :root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#0f172a;background:#eef4fb}
 body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#e0f2fe,#eff6ff 45%,#f8fafc)}
@@ -46,7 +46,7 @@ button,a.btn{appearance:none;border:0;border-radius:14px;padding:15px 16px;font-
   </div>
 
   <div class="actions">
-    <button id="installBtn" class="primary" type="button">앱 설치</button>
+    <button id="installBtn" class="primary" type="button">앱 설치 준비 중</button>
     <a class="btn secondary" href="./map.html">지도 바로 열기</a>
     <a class="btn secondary" href="./desktop.html">컴퓨터용 지도 열기</a>
   </div>
@@ -67,6 +67,10 @@ let deferredInstallPrompt = null;
 const installBox = document.getElementById('installBox');
 const installBtn = document.getElementById('installBtn');
 
+function showManualInstallMessage() {
+  alert('아직 브라우저 설치 준비 신호가 오지 않았습니다.\n\n1) 이 주소를 Chrome 일반 탭에서 열기\n2) 10~20초 기다린 뒤 새로고침\n3) Chrome 오른쪽 위 ⋮ 메뉴에서 “앱 설치” 또는 “홈 화면에 추가” 선택\n\n이미 예전 앱이 설치되어 있으면 먼저 기존 앱을 삭제해야 설치 버튼이 다시 뜰 수 있습니다.');
+}
+
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredInstallPrompt = e;
@@ -82,20 +86,37 @@ window.addEventListener('appinstalled', () => {
 installBtn.addEventListener('click', async () => {
   if (deferredInstallPrompt) {
     deferredInstallPrompt.prompt();
-    await deferredInstallPrompt.userChoice;
+    const choice = await deferredInstallPrompt.userChoice;
     deferredInstallPrompt = null;
     installBox.classList.remove('show');
+    if (choice && choice.outcome === 'accepted') {
+      installBtn.textContent = '설치 완료 - 지도 열기';
+    } else {
+      installBtn.textContent = '앱 설치';
+    }
   } else {
-    alert('브라우저가 아직 앱 설치 가능 상태로 인식하지 못했습니다. 10초 정도 기다린 뒤 새로고침하거나, 브라우저 메뉴의 “앱 설치/홈 화면에 추가”를 사용해 주세요.');
+    showManualInstallMessage();
   }
 });
 
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./service-worker.js', {scope:'./'})
-      .then(reg => console.log('Service worker registered:', reg.scope))
-      .catch(err => console.log('Service worker failed:', err));
+  window.addEventListener('load', async () => {
+    try {
+      const reg = await navigator.serviceWorker.register('./service-worker.js', {scope:'./'});
+      console.log('Service worker registered:', reg.scope);
+      if (reg.update) reg.update();
+      if (navigator.serviceWorker.ready) {
+        navigator.serviceWorker.ready.then(() => {
+          if (!deferredInstallPrompt) installBtn.textContent = '브라우저 메뉴에서 앱 설치';
+        });
+      }
+    } catch (err) {
+      console.log('Service worker failed:', err);
+      installBtn.textContent = '브라우저 메뉴에서 홈 화면에 추가';
+    }
   });
+} else {
+  installBtn.textContent = '브라우저 메뉴에서 홈 화면에 추가';
 }
 </script>
 </body>
